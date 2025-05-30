@@ -1,7 +1,11 @@
 using LogiTrack.Models;
+using Microsoft.OpenApi.Models; // Optional, for OpenApi info
+using Microsoft.AspNetCore.Builder; // Ensure this is present
+using Microsoft.Extensions.DependencyInjection; // Ensure this is present
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -15,7 +19,8 @@ var inventoryItems = new List<InventoryItem>
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
