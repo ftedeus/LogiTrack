@@ -1,0 +1,40 @@
+@LogiTrack_HostAddress = http://localhost:5069
+ 
+
+###
+GET {{LogiTrack_HostAddress}}/api/v2/
+
+###
+// Update all endpoints to use the versioned path
+GET {{LogiTrack_HostAddress}}/api/v2/inventory
+
+###
+GET {{LogiTrack_HostAddress}}/api/v2/inventory/1
+
+###
+POST {{LogiTrack_HostAddress}}/api/v2/inventory
+Content-Type: application/json
+
+{
+  "ItemId": 6,
+  "Name": "Lap top Dell ",
+  "Quantity": 10,
+  "Location": "Warehouse A"
+}
+
+###
+PUT {{LogiTrack_HostAddress}}/api/v2/inventory/3
+Content-Type: application/json
+
+{
+  "ItemId": 3,
+  "Name": "Lap top Asus ZenBook 14",
+  "Quantity": 10,
+  "Location": "Warehouse 5"
+}
+
+###
+DELETE {{LogiTrack_HostAddress}}/api/v2/inventory/3
+
+###
+GET {{LogiTrack_HostAddress}}/api/v2/inventory/OrderSummary/5
