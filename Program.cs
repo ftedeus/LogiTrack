@@ -103,5 +103,3 @@ v1.MapGet("/inventory/OrderSummary/{id}", (int id) =>
 V2Endpoints.Register(v2: app.MapGroup("/api/v2"), inventoryItems);
 
 app.Run();
-
-

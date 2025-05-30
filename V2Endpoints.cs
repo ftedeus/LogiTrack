@@ -9,11 +9,13 @@ public static class V2Endpoints
     {
         v2.MapGet("/", () => "Welcome to LogiTrack API v2!")
             .WithName("GetRootV2")
-            .WithOpenApi();
+            .WithOpenApi()
+            .WithTags("v2");
 
         v2.MapGet("/inventory", () => inventoryItems)
             .WithName("GetInventoryV2")
-            .WithOpenApi();
+            .WithOpenApi()
+            .WithTags("v2");
 
         v2.MapGet("/inventory/{id}", (int id) =>
         {
@@ -23,7 +25,8 @@ public static class V2Endpoints
                 return Results.NotFound($"[v2] Looking for ItemId: {id}, not found.");
             }
             return Results.Ok(item.DisplayInfo());
-        });
+        })
+        .WithTags("v2");
 
         v2.MapPost("/inventory", (InventoryItem item) =>
         {
@@ -33,7 +36,8 @@ public static class V2Endpoints
             }
             inventoryItems.Add(item);
             return Results.Created($"/InventoryItems/{inventoryItems.Count - 1}", item);
-        });
+        })
+        .WithTags("v2");
 
         v2.MapPut("/inventory/{id}", (int id, InventoryItem item) =>
         {
@@ -51,7 +55,8 @@ public static class V2Endpoints
             existingItem.Quantity = item.Quantity;
             existingItem.Location = item.Location;
             return Results.Ok(existingItem);
-        });
+        })
+        .WithTags("v2");
 
         v2.MapDelete("/inventory/{id}", (int id) =>
         {
@@ -63,7 +68,8 @@ public static class V2Endpoints
             var info = item.DisplayInfo();
             inventoryItems.Remove(item);
             return Results.Ok($"[v2] Item deleted: {info}");
-        });
+        })
+        .WithTags("v2");
 
         v2.MapGet("/inventory/OrderSummary/{id}", (int id) =>
         {
@@ -73,7 +79,8 @@ public static class V2Endpoints
                 return Results.NotFound($"[v2] Item {id} not found.");
             }
             return Results.Ok(item.DisplayInfo());
-        });
+        })
+        .WithTags("v2");
 
         // In-memory orders list (for demo; in real apps, use DI/service)
         var orders = new List<Order>
@@ -96,7 +103,8 @@ public static class V2Endpoints
 
         // Get all orders
         v2.MapGet("/orders", () => orders)
-            .WithName("GetAllOrdersV2");
+            .WithName("GetAllOrdersV2")
+            .WithTags("v2");
 
         // Get one order by id
         v2.MapGet("/orders/{orderId}", (int orderId) =>
@@ -105,7 +113,8 @@ public static class V2Endpoints
             if (order == null)
                 return Results.NotFound($"[v2] Order {orderId} not found.");
             return Results.Ok(order);
-        }).WithName("GetOrderV2");
+        }).WithName("GetOrderV2")
+         .WithTags("v2");
 
         // Post one order
         v2.MapPost("/orders", (Order order) =>
@@ -114,7 +123,8 @@ public static class V2Endpoints
                 return Results.Conflict($"[v2] Order {order.OrderId} already exists.");
             orders.Add(order);
             return Results.Created($"/orders/{order.OrderId}", order);
-        }).WithName("PostOrderV2");
+        }).WithName("PostOrderV2")
+        .WithTags("v2");
 
         // Delete one order
         v2.MapDelete("/orders/{orderId}", (int orderId) =>
@@ -124,6 +134,7 @@ public static class V2Endpoints
                 return Results.NotFound($"[v2] Order {orderId} not found.");
             orders.Remove(order);
             return Results.Ok($"[v2] Order {orderId} deleted.");
-        }).WithName("DeleteOrderV2");
+        }).WithName("DeleteOrderV2")
+         .WithTags("v2");
     }
 }
