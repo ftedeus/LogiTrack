@@ -37,4 +37,31 @@ Content-Type: application/json
 DELETE {{LogiTrack_HostAddress}}/api/v2/inventory/3
 
 ###
-GET {{LogiTrack_HostAddress}}/api/v2/inventory/OrderSummary/5
+GET {{LogiTrack_HostAddress}}/api/v2/inventory/OrderSummary/3
+
+###
+GET {{LogiTrack_HostAddress}}/api/v2/orders
+
+###
+GET {{LogiTrack_HostAddress}}/api/v2/orders/1001
+
+###
+POST {{LogiTrack_HostAddress}}/api/v2/orders
+Content-Type: application/json
+
+{
+  "OrderId": 1003,
+  "CustomerName": "Alex",
+  "DatePlaced": "2025-05-01T10:00:00",
+  "Items": [
+    {
+      "ItemId": 6,
+      "Name": "Lap top Dell ",
+      "Quantity": 10,
+      "Location": "Warehouse A"
+    }
+  ]
+}
+
+###
+DELETE {{LogiTrack_HostAddress}}/api/v2/orders/1002

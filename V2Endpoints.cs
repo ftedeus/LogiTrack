@@ -74,5 +74,56 @@ public static class V2Endpoints
             }
             return Results.Ok(item.DisplayInfo());
         });
+
+        // In-memory orders list (for demo; in real apps, use DI/service)
+        var orders = new List<Order>
+        {
+            new Order
+            {
+                OrderId = 1001,
+                CustomerName = "Samir",
+                DatePlaced = new DateTime(2025, 4, 5),
+                Items = new List<InventoryItem> { inventoryItems.FirstOrDefault() }
+            },
+            new Order
+            {
+                OrderId = 1002,
+                CustomerName = "Alex",
+                DatePlaced = new DateTime(2025, 5, 1),
+                Items = inventoryItems.Take(2).ToList() // first two items
+            }
+        };
+
+        // Get all orders
+        v2.MapGet("/orders", () => orders)
+            .WithName("GetAllOrdersV2");
+
+        // Get one order by id
+        v2.MapGet("/orders/{orderId}", (int orderId) =>
+        {
+            var order = orders.FirstOrDefault(o => o.OrderId == orderId);
+            if (order == null)
+                return Results.NotFound($"[v2] Order {orderId} not found.");
+            return Results.Ok(order);
+        }).WithName("GetOrderV2");
+
+        // Post one order
+        v2.MapPost("/orders", (Order order) =>
+        {
+            if (orders.Any(o => o.OrderId == order.OrderId))
+                return Results.Conflict($"[v2] Order {order.OrderId} already exists.");
+            orders.Add(order);
+            return Results.Created($"/orders/{order.OrderId}", order);
+        }).WithName("PostOrderV2");
+
+        // Delete one order
+        v2.MapDelete("/orders/{orderId}", (int orderId) =>
+        {
+            var order = orders.FirstOrDefault(o => o.OrderId == orderId);
+            if (order == null)
+                return Results.NotFound($"[v2] Order {orderId} not found.");
+            orders.Remove(order);
+            return Results.Ok($"[v2] Order {orderId} deleted.");
+        }).WithName("DeleteOrderV2");
     }
 }
