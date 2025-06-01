@@ -1,22 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace LogiTrack.Models
+public class Order
 {
-    public class Order
+    public int OrderId { get; set; }
+    public string CustomerName { get; set; }
+    public DateTime OrderPlaced { get; set; }
+    public List<OrderItem> Items { get; set; } = new List<OrderItem>();
+
+     
+
+    public string GetOrderSummary()
     {
-        [Key]
-        public int OrderId { get; set; }
+        return $"Order #{OrderId} for {CustomerName} | Items: {Items.Count} | Placed: {OrderPlaced.ToShortDateString()}";
+    }
 
-        [Required]
-        [StringLength(100)]
-        public string CustomerName { get; set; }
-
-        [Required]
-        public DateTime DatePlaced { get; set; }
-
-        [Required]
-        public List<InventoryItem> Items { get; set; }
+    public override string ToString()
+    {
+        return $"Order ID: {OrderId}, Customer: {CustomerName}, Date: {OrderPlaced.ToShortDateString()}, Items: {Items.Count}";
     }
 }

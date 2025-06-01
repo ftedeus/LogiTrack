@@ -1,22 +1,37 @@
-using LogiTrack.Models;
 using Microsoft.OpenApi.Models; // Optional, for OpenApi info
 using Microsoft.AspNetCore.Builder; // Ensure this is present
 using Microsoft.Extensions.DependencyInjection; // Ensure this is present
+using Microsoft.EntityFrameworkCore; // Add this
+using Microsoft.Extensions.Configuration; // Add this
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add this to read connection string from appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Use AppDbContext and SQLite with connection string from config
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(connectionString));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Register InventoryRepository in DI
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+
+
 var app = builder.Build();
 
-var inventoryItems = new List<InventoryItem>
-{
-    new InventoryItem { ItemId = 1, Name = "Widget A", Quantity = 100, Location = "Warehouse 1" },
-    new InventoryItem { ItemId = 2, Name = "Widget B", Quantity = 50, Location = "Warehouse 2" },
-    new InventoryItem { ItemId = 3, Name = "Widget C", Quantity = 200, Location = "Warehouse 3" }
-};
+// Seed sample data using DI scope
+// using (var scope = app.Services.CreateScope())
+// {
+//     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//     SampleDataSeeder.Seed(db);
+//     Console.WriteLine("Sample data inserted.");
+// }
 
-// Configure the HTTP request pipeline.
+ 
+
+// // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -31,13 +46,15 @@ v1.MapGet("/", () => "Welcome to LogiTrack API v1!")
     .WithName("GetRoot")
     .WithOpenApi();
 
-v1.MapGet("/inventory", () => inventoryItems)
+
+v1.MapGet("/inventory", async (IInventoryRepository repo) =>
+    await repo.GetAllAsync())
     .WithName("GetInventory")
     .WithOpenApi();
 
-v1.MapGet("/inventory/{id}", (int id) =>
+v1.MapGet("/inventory/{id}", async (IInventoryRepository repo, int id) =>
 {
-    var item = inventoryItems.FirstOrDefault(i => i.ItemId == id);
+    var item = await repo.GetByIdAsync(id);
     if (item == null)
     {
         return Results.NotFound($"Looking for ItemId: {id},  not found: ");
@@ -45,61 +62,68 @@ v1.MapGet("/inventory/{id}", (int id) =>
     return Results.Ok(item.DisplayInfo());
 });
 
-v1.MapPost("/inventory", (InventoryItem item) =>
+v1.MapPost("/inventory", async (IInventoryRepository repo, InventoryItem item) =>
 {
-    // Prevent duplicates by ItemId
-    if (inventoryItems.Any(i => i.ItemId == item.ItemId))
+    // Prevent duplicates by Id
+    if (await repo.ExistsAsync(item.Id))
     {
-        return Results.Conflict($"An item with ItemId {item.ItemId} already exists.");
+        return Results.Conflict($"An item with Id {item.Id} already exists.");
     }
-    inventoryItems.Add(item);
-    return Results.Created($"/InventoryItems/{inventoryItems.Count - 1}", item);
+    await repo.AddAsync(item);
+    return Results.Created($"/api/v1/inventory/{item.Id}", item);
 });
 
-v1.MapPut("/inventory/{id}", (int id, InventoryItem item) =>
+v1.MapPut("/inventory/{id}", async (IInventoryRepository repo, int id, InventoryItem item) =>
 {
-    var existingItem = inventoryItems.FirstOrDefault(i => i.ItemId == id);
+    var existingItem = await repo.GetByIdAsync(id);
     if (existingItem == null)
     {
-        return Results.NotFound($"Item {id}  Not found.");
+        return Results.NotFound($"Item {id} Not found.");
     }
-    // Prevent changing ItemId to a duplicate
-    if (item.ItemId != id && inventoryItems.Any(i => i.ItemId == item.ItemId))
+    // Prevent changing Id to a duplicate
+    if (item.Id != id && await repo.ExistsAsync(item.Id))
     {
-        return Results.Conflict($"An item with ItemId {item.ItemId} already exists.");
+        return Results.Conflict($"An item with Id {item.Id} already exists.");
     }
     // Update properties
-    existingItem.ItemId = item.ItemId;
     existingItem.Name = item.Name;
     existingItem.Quantity = item.Quantity;
     existingItem.Location = item.Location;
+    await repo.UpdateAsync(existingItem);
     return Results.Ok(existingItem);
 });
 
-v1.MapDelete("/inventory/{id}", (int id) =>
+v1.MapDelete("/inventory/{id}", async (IInventoryRepository repo, int id) =>
 {
-    var item = inventoryItems.FirstOrDefault(i => i.ItemId == id);
+    var item = await repo.GetByIdAsync(id);
     if (item == null)
     {
         return Results.NotFound($"Item {id} not found.");
     }
-    // display item info before deletion
     var info = item.DisplayInfo();
-    inventoryItems.Remove(item);
+    await repo.DeleteAsync(item);
     return Results.Ok($"Item deleted: {info}");
 });
 
-v1.MapGet("/inventory/OrderSummary/{id}", (int id) =>
+v1.MapGet("/inventory/OrderSummary/{id}", async (IInventoryRepository repo, int id) =>
 {
-    var item = inventoryItems.FirstOrDefault(i => i.ItemId == id);
-    if (item == null)
-    {
-        return Results.NotFound($"Item {id} not found.");
-    }
-    return Results.Ok(item.DisplayInfo());
-});
+    var summary = await repo.GetOrderSummaryAsync(id);
+    if (summary == null)
+        return Results.NotFound($"Order {id} not found.");
+    return Results.Ok(summary);
+})
+.WithName("GetOrderSummary")
+.WithOpenApi();
+
+v1.MapGet("/inventory/OrderSummary", async (IInventoryRepository repo) =>
+{
+    var summaries = await repo.GetAllOrderSummariesAsync();
+    return Results.Ok(summaries);
+})
+.WithName("GetAllOrderSummaries")
+.WithOpenApi();
 
 // Register v2 endpoints from a separate file
-V2Endpoints.Register(v2: app.MapGroup("/api/v2"), inventoryItems);
+//V2Endpoints.Register(v2: app.MapGroup("/api/v2"), inventoryItems);
 
 app.Run();

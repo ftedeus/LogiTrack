@@ -1,26 +1,18 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace LogiTrack.Models
+public class InventoryItem
 {
-    public class InventoryItem
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public int Quantity { get; set; }
+    public string? Location { get; set; }
+    public decimal Price { get; set; }
+
+    public override string ToString()
     {
-        [Key]
-        public int ItemId { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string Name { get; set; }
-
-        [Range(0, int.MaxValue)]
-        public int Quantity { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string Location { get; set; }
-
-        public string DisplayInfo()
-        {
-            return $"Item: {Name} | Quantity: {Quantity} | Location: {Location}";
-        }
+        return $"{Name} - Quantity: {Quantity}, Price: {Price:C}";
     }
+
+    public string DisplayInfo()
+    {
+        return $"{Name} - Quantity: {Quantity}, Location: {Location}, Price: {Price:C}";
+    }   
 }
