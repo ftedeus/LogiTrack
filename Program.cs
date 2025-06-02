@@ -89,6 +89,9 @@ builder.Services.AddSwaggerGen(c =>
 // Register InventoryRepository in DI
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 
+// Add in-memory caching
+builder.Services.AddMemoryCache();
+
 // Add this line to enable controller routing
 builder.Services.AddControllers();
 
@@ -126,4 +129,3 @@ var v1 = app.MapGroup("/api/v1");
 
 app.Run();
 
-// No code changes required. Install the missing NuGet package as described above.

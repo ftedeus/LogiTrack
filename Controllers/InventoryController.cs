@@ -11,36 +11,40 @@ namespace LogiTrack.Controllers
     [Route("api/v1/inventory")]
     public class InventoryController : ControllerBase
     {
-        private readonly InventoryRepository _repository;
+        private readonly IInventoryRepository _repository;
 
-        public InventoryController(AppDbContext db)
+        public InventoryController(IInventoryRepository repository)
         {
-            _repository = new InventoryRepository(db);
+            _repository = repository;
         }
 
         // GET: /api/v1/inventory
         [HttpGet]
-        [Authorize]
-        public async Task<ActionResult<List<InventoryItem>>> GetAll()
+       // [Authorize]
+        public async Task<ActionResult<IEnumerable<InventoryItem>>> GetAll()
         {
+            // Optionally measure performance
+            // var sw = System.Diagnostics.Stopwatch.StartNew();
             var items = await _repository.GetAllAsync();
+            // sw.Stop();
+            // Console.WriteLine($"GetAll executed in {sw.ElapsedMilliseconds} ms");
             return Ok(items);
         }
 
         // GET: /api/v1/inventory/{id}
         [HttpGet("{id}")]
-       [Authorize]
-        public async Task<ActionResult<string>> GetById(int id)
+      // [Authorize]
+        public async Task<ActionResult<InventoryItem>> GetById(int id)
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
                 return NotFound($"Inventory item with Id {id} was not found.");
-            return Ok(item.DisplayInfo());
+            return Ok(item);
         }
 
         // POST: /api/v1/inventory
         [HttpPost]
-        [Authorize(Roles = "Manager")]
+       // [Authorize(Roles = "Manager")]
         public async Task<ActionResult<InventoryItem>> Add([FromBody] InventoryItem item)
         {
             if (!ModelState.IsValid)
@@ -66,7 +70,7 @@ namespace LogiTrack.Controllers
 
         // DELETE: /api/v1/inventory/{id}
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Manager")]
+       // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Delete(int id)
         {
             try

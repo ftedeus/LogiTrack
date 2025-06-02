@@ -10,18 +10,22 @@ namespace LogiTrack.Controllers
     [Route("api/[controller]")]
     public class OrderController : ControllerBase
     {
-        private readonly InventoryRepository _repository;
+        private readonly IInventoryRepository _repository;
 
-        public OrderController(AppDbContext db)
+        public OrderController(IInventoryRepository repository)
         {
-            _repository = new InventoryRepository(db);
+            _repository = repository;
         }
 
         // GET: /api/v1/orders
         [HttpGet]
-        public async Task<ActionResult<List<Order>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Order>>> GetAll()
         {
+            // Optionally measure performance
+            // var sw = System.Diagnostics.Stopwatch.StartNew();
             var orders = await _repository.GetAllOrdersAsync();
+            // sw.Stop();
+            // Console.WriteLine($"GetAllOrders executed in {sw.ElapsedMilliseconds} ms");
             return Ok(orders);
         }
 
