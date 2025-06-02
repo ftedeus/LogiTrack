@@ -42,8 +42,8 @@ appsettings.json     # Configuration (connection strings, JWT, etc.)
 
 1. **Clone the repository:**
    ```sh
-   git clone <your-repo-url>
-   cd <repo-folder>
+   git https://clone github.com/ftedeus/LogiTrack.git
+   cd LogiTrack
    ```
 
 2. **Restore dependencies:**
