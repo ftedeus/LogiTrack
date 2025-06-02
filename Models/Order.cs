@@ -1,3 +1,5 @@
+using LogiTrack.Models;
+
 public class Order
 {
     public int OrderId { get; set; }

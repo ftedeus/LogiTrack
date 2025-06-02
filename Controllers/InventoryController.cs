@@ -1,9 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-
-using LogiTrack.Data; // Ensure this matches the actual namespace in InventoryRepository.cs
+using LogiTrack.Data;
+using LogiTrack.Models; // Add this line
 
 namespace LogiTrack.Controllers
 {
@@ -20,6 +20,7 @@ namespace LogiTrack.Controllers
 
         // GET: /api/v1/inventory
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<InventoryItem>>> GetAll()
         {
             var items = await _repository.GetAllAsync();
@@ -28,6 +29,7 @@ namespace LogiTrack.Controllers
 
         // GET: /api/v1/inventory/{id}
         [HttpGet("{id}")]
+       [Authorize]
         public async Task<ActionResult<string>> GetById(int id)
         {
             var item = await _repository.GetByIdAsync(id);
@@ -38,28 +40,47 @@ namespace LogiTrack.Controllers
 
         // POST: /api/v1/inventory
         [HttpPost]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<InventoryItem>> Add([FromBody] InventoryItem item)
         {
-            if (item == null)
-                return BadRequest();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var exists = await _repository.ExistsAsync(item.Id);
-            if (exists)
-                return Conflict($"An item with Id {item.Id} already exists.");
+            try
+            {
+                if (item == null)
+                    return BadRequest();
 
-            var addedItem = await _repository.AddAsync(item);
-            return CreatedAtAction(nameof(GetAll), null, addedItem);
+                var exists = await _repository.ExistsAsync(item.Id);
+                if (exists)
+                    return Conflict($"An item with Id {item.Id} already exists.");
+
+                var addedItem = await _repository.AddAsync(item);
+                return CreatedAtAction(nameof(GetAll), null, addedItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // DELETE: /api/v1/inventory/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _repository.DeleteAsync(id);
-            if (!deleted)
-                 return NotFound($"Inventory item with Id {id} was not found.");
+            try
+            {
+                var deleted = await _repository.DeleteAsync(id);
+                if (!deleted)
+                    return NotFound($"Inventory item with Id {id} was not found.");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

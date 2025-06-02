@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using LogiTrack.Models;
+
 namespace LogiTrack.Data
 {
     public interface IInventoryRepository

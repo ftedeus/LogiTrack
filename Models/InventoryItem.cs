@@ -1,18 +1,13 @@
-public class InventoryItem
+namespace LogiTrack.Models
 {
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public int Quantity { get; set; }
-    public string? Location { get; set; }
-    public decimal Price { get; set; }
-
-    public override string ToString()
+    public class InventoryItem
     {
-        return $"{Name} - Quantity: {Quantity}, Price: {Price:C}";
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int Quantity { get; set; }
+        public string Location { get; set; }
+        public decimal Price { get; set; }
+
+        public string DisplayInfo() => $"{Id}: {Name}";
     }
-
-    public string DisplayInfo()
-    {
-        return $"{Name} - Quantity: {Quantity}, Location: {Location}, Price: {Price:C}";
-    }   
 }

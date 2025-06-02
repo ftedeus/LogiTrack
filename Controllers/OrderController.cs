@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LogiTrack.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LogiTrack.Controllers
-{
+{   [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class OrderController : ControllerBase

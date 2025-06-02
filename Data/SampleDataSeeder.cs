@@ -1,4 +1,6 @@
 using System;
+using LogiTrack.Models;
+
 public static class SampleDataSeeder
 {
     public static void Seed(AppDbContext db)

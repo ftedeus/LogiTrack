@@ -1,11 +1,37 @@
 @LogiTrack_HostAddress = http://localhost:5069
- 
 
 ###
-GET {{LogiTrack_HostAddress}}/api/v1/
+# Obtain JWT token
+POST {{LogiTrack_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "Manager@Tester.com",
+  "password": "Manager@0000"
+}
 
 ###
-GET {{LogiTrack_HostAddress}}/api/v2/
+# Obtain JWT token
+POST {{LogiTrack_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "Francis@Tester.com",
+  "password": "Francis@0000"
+}
+
+
+###
+# Set your JWT token here after copying from the login response
+@jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNTg4NTc0Ny01YmRkLTQxMWEtOWEwYi05MTEzNTVjYzM0NzEiLCJlbWFpbCI6Ik1hbmFnZXJAVGVzdGVyLmNvbSIsIkZpcnN0TmFtZSI6Ik1hbmFnZXIiLCJMYXN0TmFtZSI6Ik1hbmFnZXIgRnJhbmNpcyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6Ik1hbmFnZXIiLCJleHAiOjE3NDg4NzQ5NTksImlzcyI6IkxvZ2lUcmFjayIsImF1ZCI6IkxvZ2lUcmFja3VzZXJzIn0.QyZs30uh_MbczpKA0TLTc9xeTR8ZGt7e-fZIFY1J6cw
+
+###
+
+# ###
+# GET {{LogiTrack_HostAddress}}/api/v1/
+
+# ###
+# GET {{LogiTrack_HostAddress}}/api/v2/
 
 ###
 // Update all endpoints to use the versioned path
@@ -16,11 +42,12 @@ GET {{LogiTrack_HostAddress}}/api/v1/inventory/1
 
 ###
 POST {{LogiTrack_HostAddress}}/api/v1/inventory
+Authorization: Bearer {{jwt}}
 Content-Type: application/json
 
 {
-  "ItemId": 5,
-  "Name": "Lap top Dell",
+  "ItemId": 6,
+  "Name": "Lap top HP",
   "Quantity": 5,
   "Location": "Warehouse A"
 }
@@ -41,3 +68,33 @@ DELETE {{LogiTrack_HostAddress}}/api/v1/inventory/3
 
 ###
 GET {{LogiTrack_HostAddress}}/api/v1/inventory/OrderSummary/5
+
+###
+
+GET {{LogiTrack_HostAddress}}/api/order
+Authorization: Bearer {{jwt}}
+
+###
+GET {{LogiTrack_HostAddress}}/api/order/1
+Authorization: Bearer {{jwt}}
+
+###
+POST {{LogiTrack_HostAddress}}/api/order
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "orderId": 10,
+  "customerName": "John Doe",
+  "orderDate": "2024-06-01T12:00:00Z",
+  "items": [
+    {
+      "itemId": 5,
+      "quantity": 2
+    }
+  ]
+}
+
+###
+DELETE {{LogiTrack_HostAddress}}/api/order/10
+Authorization: Bearer {{jwt}}
