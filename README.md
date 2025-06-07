@@ -5,6 +5,7 @@
 ![Swagger](https://img.shields.io/badge/Swagger-UI-green?logo=swagger)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
 LogiTrack is an ASP.NET Core Web API for inventory and order management, featuring authentication, role-based authorization, and caching. It uses Entity Framework Core with SQLite and supports JWT authentication.
 ## Features
 
