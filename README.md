@@ -1,15 +1,11 @@
-# LogiTrack
-
-LogiTrack is an ASP.NET Core Web API for inventory and order management, featuring authentication, role-based authorization, and caching. It uses Entity Framework Core with SQLite and supports JWT authentication.
- 
-
+# 🛠️LogiTrack
  ![Build Status](https://github.com/ftedeus/LogiTrack/actions/workflows/ci-cd-pipeline.yml/badge.svg)
 ![.NET](https://img.shields.io/badge/.NET-8.0-blueviolet?logo=dotnet)
 ![EF Core](https://img.shields.io/badge/EF%20Core-8.0-blue?logo=ef)
 ![Swagger](https://img.shields.io/badge/Swagger-UI-green?logo=swagger)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-
+LogiTrack is an ASP.NET Core Web API for inventory and order management, featuring authentication, role-based authorization, and caching. It uses Entity Framework Core with SQLite and supports JWT authentication.
 ## Features
 
 - Inventory CRUD (Create, Read, Update, Delete)
